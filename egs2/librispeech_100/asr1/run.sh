@@ -9,7 +9,10 @@ train_set="train_clean_100"
 valid_set="dev"
 test_sets="test_clean test_other dev_clean dev_other"
 
-asr_config=conf/train_asr.yaml
+asr_config=conf/tuning/train_asr_conformer_lr2e-3_warmup15k_amp_nondeterministic.yaml
+# lm_config=../../librispeech/asr1/conf/tuning/train_lm_transformer2.yaml
+# lm_config=../lm1/conf/train_transformer_opt.yaml
+lm_config=../lm1/conf/train_transformer_opt_notLSM.yaml
 inference_config=conf/decode_asr.yaml
 
 ./asr.sh \
