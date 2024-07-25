@@ -26,11 +26,14 @@ inference_config=conf/decode_asr.yaml
     --speed_perturb_factors "0.9 1.0 1.1" \
     --audio_format "flac.ark" \
     --feats_type raw \
-    --use_lm false \
+    --lm_config "${lm_config}" \
     --asr_config "${asr_config}" \
     --inference_config "${inference_config}" \
     --train_set "${train_set}" \
     --valid_set "${valid_set}" \
     --test_sets "${test_sets}" \
+    --lm_train_text "data/local/other_text/text" \
+    --hugging_face_model_name_or_path "facebook/opt-125m" \
+    --token_type "hugging_face" \
     --lm_train_text "data/${train_set}/text" \
     --bpe_train_text "data/${train_set}/text" "$@"
