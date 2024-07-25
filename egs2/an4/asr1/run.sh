@@ -7,6 +7,7 @@ set -o pipefail
 
 ./asr.sh \
     --lang en \
+    --nj 8 \
     --asr_config conf/train_asr_transformer.yaml \
     --inference_config conf/decode_asr.yaml \
     --lm_config conf/train_lm.yaml \
