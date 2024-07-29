@@ -35,5 +35,4 @@ inference_config=conf/decode_asr.yaml
     --lm_train_text "data/local/other_text/text" \
     --hugging_face_model_name_or_path "facebook/opt-125m" \
     --token_type "hugging_face" \
-    --lm_train_text "data/${train_set}/text" \
     --bpe_train_text "data/${train_set}/text" "$@"
