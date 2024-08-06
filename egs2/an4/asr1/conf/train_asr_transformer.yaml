@@ -1,6 +1,6 @@
 batch_type: folded
-batch_size: 64
-accum_grad: 1
+batch_size: 16
+accum_grad: 4
 max_epoch: 200
 patience: none
 # The initialization method for model parameters
