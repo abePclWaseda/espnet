@@ -2,19 +2,20 @@ import subprocess
 import time
 import csv
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # ログファイルのパスを指定
 log_file = 'gpu_usage_log.csv'
+graph_file = 'gpu_memory_usage_plot.png'
 
 # ログファイルのヘッダーを書き込み
 with open(log_file, 'w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(['Timestamp', 'GPU ID', 'GPU Utilization (%)', 'Memory Utilization (%)', 'Memory Used (MiB)', 'Memory Capacity (MiB)'])
+    writer.writerow(['Timestamp', 'GPU ID', 'Memory Used (MiB)'])
 
-# nvidia-smi コマンドを実行して GPU の使用率、メモリの使用率、メモリの使用量、総容量を取得
-def get_gpu_usage_and_memory():
-    # GPU ID, GPU の使用率とメモリ使用率を取得
-    utilization_result = subprocess.run(['nvidia-smi', '--query-gpu=index,utilization.gpu,utilization.memory', '--format=csv,noheader,nounits'],
+# nvidia-smi コマンドを実行して GPU のメモリ使用量を取得
+def get_gpu_memory_usage():
+    utilization_result = subprocess.run(['nvidia-smi', '--query-gpu=index,memory.used', '--format=csv,noheader,nounits'],
                                         stdout=subprocess.PIPE, text=True)
     utilization_lines = utilization_result.stdout.strip().split('\n')
     
@@ -23,34 +24,44 @@ def get_gpu_usage_and_memory():
     for line in utilization_lines:
         data = line.split(',')
         gpu_id = data[0].strip()
-        gpu_utilization = data[1].strip()
-        memory_utilization = data[2].strip()
-        
-        # GPU メモリの使用量と総容量を取得
-        memory_result = subprocess.run(['nvidia-smi', '--query-gpu=memory.used,memory.total', '--format=csv,noheader,nounits', '--id={}'.format(gpu_id)],
-                                       stdout=subprocess.PIPE, text=True)
-        memory = memory_result.stdout.strip().split(',')
-        memory_used = memory[0].strip()
-        memory_capacity = memory[1].strip()
-        
-        gpu_data.append([gpu_id, gpu_utilization, memory_utilization, memory_used, memory_capacity])
+        memory_used = data[1].strip()
+        gpu_data.append([gpu_id, memory_used])
     
     return gpu_data
 
-# 定期的にGPU使用率とメモリ情報をログに記録
-def log_gpu_usage(interval=60):
+# メモリ使用量を時間ごとにログに記録し、プロット
+def log_and_plot_gpu_memory_usage(interval=60):
+    timestamps = []
+    memory_usage = []
+
     while True:
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        gpu_data = get_gpu_usage_and_memory()
-        
+        gpu_data = get_gpu_memory_usage()
+
         # ログファイルに書き込み
         with open(log_file, 'a', newline='') as file:
             writer = csv.writer(file)
             for data in gpu_data:
                 writer.writerow([timestamp] + data)
 
+        # データをリストに保存（ここでは最初のGPUのみをプロット）
+        timestamps.append(timestamp)
+        memory_usage.append(float(gpu_data[0][1]))  # 最初のGPUのメモリ使用量を使用
+
+        # プロットを更新
+        plt.figure(figsize=(10, 6))
+        plt.plot(timestamps, memory_usage, marker='o')
+        plt.title('GPU Memory Usage Over Time')
+        plt.xlabel('Timestamp')
+        plt.ylabel('Memory Used (MiB)')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        # グラフを保存
+        plt.savefig(graph_file)
+
         # 指定された間隔で待機
         time.sleep(interval)
 
 if __name__ == '__main__':
-    log_gpu_usage(interval=30)  # 30秒ごとにログを記録
+    log_and_plot_gpu_memory_usage(interval=20)  # 60秒ごとにログとプロットを更新
