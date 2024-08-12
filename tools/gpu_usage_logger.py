@@ -4,6 +4,7 @@ import csv
 from datetime import datetime
 import matplotlib.pyplot as plt
 
+# python3 ./tools/gpu_usage_logger.py で開始
 # ログファイルのパスを指定
 log_file = 'gpu_usage_log.csv'
 graph_file = 'gpu_memory_usage_plot.png'
@@ -38,27 +39,32 @@ def log_and_plot_gpu_memory_usage(interval=60):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         gpu_data = get_gpu_memory_usage()
 
-        # ログファイルに書き込み
-        with open(log_file, 'a', newline='') as file:
-            writer = csv.writer(file)
-            for data in gpu_data:
-                writer.writerow([timestamp] + data)
+        # 二番目のGPUのデータを取得
+        if len(gpu_data) > 1:
+            second_gpu_data = gpu_data[1]
+            gpu_id = second_gpu_data[0]
+            memory_used = float(second_gpu_data[1])
 
-        # データをリストに保存（ここでは最初のGPUのみをプロット）
-        timestamps.append(timestamp)
-        memory_usage.append(float(gpu_data[0][1]))  # 最初のGPUのメモリ使用量を使用
+            # ログファイルに書き込み
+            with open(log_file, 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([timestamp, gpu_id, memory_used])
 
-        # プロットを更新
-        plt.figure(figsize=(10, 6))
-        plt.plot(timestamps, memory_usage, marker='o')
-        plt.title('GPU Memory Usage Over Time')
-        plt.xlabel('Timestamp')
-        plt.ylabel('Memory Used (MiB)')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
+            # データをリストに保存
+            timestamps.append(timestamp)
+            memory_usage.append(memory_used)
 
-        # グラフを保存
-        plt.savefig(graph_file)
+            # プロットを更新
+            plt.figure(figsize=(10, 6))
+            plt.plot(timestamps, memory_usage, marker='o')
+            plt.title(f'GPU {gpu_id} Memory Usage Over Time')
+            plt.xlabel('Timestamp')
+            plt.ylabel('Memory Used (MiB)')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+            # グラフを保存
+            plt.savefig(graph_file)
 
         # 指定された間隔で待機
         time.sleep(interval)
