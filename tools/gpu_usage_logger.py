@@ -1,7 +1,7 @@
 import subprocess
 import time
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 
 # python3 ./tools/gpu_usage_logger.py で開始
@@ -31,11 +31,14 @@ def get_gpu_memory_usage():
     return gpu_data
 
 # メモリ使用量を時間ごとにログに記録し、プロット
-def log_and_plot_gpu_memory_usage(interval=60):
+def log_and_plot_gpu_memory_usage(interval=60, duration_hours=4):
+    start_time = datetime.now()
+    end_time = start_time + timedelta(hours=duration_hours)
+
     timestamps = []
     memory_usage = []
 
-    while True:
+    while datetime.now() < end_time:
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         gpu_data = get_gpu_memory_usage()
 
@@ -70,4 +73,4 @@ def log_and_plot_gpu_memory_usage(interval=60):
         time.sleep(interval)
 
 if __name__ == '__main__':
-    log_and_plot_gpu_memory_usage(interval=20)  # 60秒ごとにログとプロットを更新
+    log_and_plot_gpu_memory_usage(interval=20, duration_hours=4)  # 20秒ごとにログとプロットを更新し、4時間後に終了
