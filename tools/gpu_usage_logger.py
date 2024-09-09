@@ -73,4 +73,4 @@ def log_and_plot_gpu_memory_usage(interval=60, duration_hours=4):
         time.sleep(interval)
 
 if __name__ == '__main__':
-    log_and_plot_gpu_memory_usage(interval=20, duration_hours=4)  # 20秒ごとにログとプロットを更新し、4時間後に終了
+    log_and_plot_gpu_memory_usage(interval=5, duration_hours=4)  # 20秒ごとにログとプロットを更新し、4時間後に終了
