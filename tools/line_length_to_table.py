@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 # ファイルパスの設定
 input_file_path = 'lm_train_line_lengths.txt'
-line_count = 100
+line_count = 5000
 output_image_path = f'line_lengths_plot_first_{line_count}.png'  # 保存する画像ファイルのパス
 
 # テキストファイルを読み込み、データをグラフ化するプログラム
