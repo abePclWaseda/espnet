@@ -1,6 +1,6 @@
 # ファイルパスの設定
-input_file_path = 'lm_train_sorted.txt'
-output_file_path = 'lm_train_filtered.txt'  # フィルタリングした後の元のテキストを記録する新しいファイル
+input_file_path = 'egs2/librispeech_100/asr1/dump/raw/lm_train_filtered.txt'
+output_file_path = 'egs2/librispeech_100/asr1/dump/raw/lm_train_filtered_0916.txt'  # フィルタリングした後の元のテキストを記録する新しいファイル
 
 # 各行の長さをフィルタリングして元のテキストをファイルに書き込むプログラム
 try:
