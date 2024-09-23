@@ -1,6 +1,6 @@
 # ファイルパスの設定
-input_file_path = 'lm_train_sorted.txt'
-output_file_path = 'lm_train_line_lengths.txt'
+input_file_path = 'lm_train_filtered.txt'
+output_file_path = 'lm_train_filtered_line_lengths.txt'
 
 # 各行の長さをファイルに書き込むプログラム
 try:
