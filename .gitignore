@@ -102,3 +102,7 @@ tools/ffmpeg-*-static
 tools/ffmpeg-release
 tools/ffmpeg-release-*.tar.xz
 tools/Miniconda3-latest-*.sh
+lm_train_filtered_line_lengths.txt
+lm_train_filtered.txt
+lm_train_line_lengths.txt
+lm_train_sorted.txt
