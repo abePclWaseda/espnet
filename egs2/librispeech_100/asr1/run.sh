@@ -31,6 +31,6 @@ inference_config=conf/decode_asr.yaml
     --valid_set "${valid_set}" \
     --test_sets "${test_sets}" \
     --lm_train_text "data/local/other_text/text" \
-    --hugging_face_model_name_or_path "facebook/opt-125m" \
+    --hugging_face_model_name_or_path "openai-community/gpt2" \
     --token_type "hugging_face" \
     --bpe_train_text "data/${train_set}/text" "$@"
