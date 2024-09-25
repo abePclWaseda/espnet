@@ -10,7 +10,7 @@ valid_set="dev"
 test_sets="test_clean test_other dev_clean dev_other"
 
 asr_config=conf/tuning/train_asr_conformer_lr2e-3_warmup15k_amp_nondeterministic.yaml
-lm_config=../lm1/conf/train_transformer_gpt2_notLSM.yaml
+lm_config=../lm1/conf/train_transformer_gpt2.yaml
 inference_config=conf/decode_asr.yaml
 
 ./asr.sh \
