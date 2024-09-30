@@ -39,7 +39,7 @@ class HuggingfaceGPT2Model(AbsLM):
             # remove_head=True の場合の処理（今回は考慮しない）
             pass
         else:
-            self.decoder = pretrained_gpt2_model
+            self.decoder = GPT2Model(config)
             self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
             self.lm_head.weight = self.decoder.wte.weight
 
