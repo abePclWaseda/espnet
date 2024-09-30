@@ -32,7 +32,7 @@ class HuggingfaceGPT2Model(AbsLM):
         pretrained_gpt2_model = GPT2Model.from_pretrained(gpt2_name)
         pretrained_gpt2_model_dict = pretrained_gpt2_model.state_dict()
         pre_trained_lm_head = pretrained_gpt2_model_dict.pop("wte.weight")
-        self.pretrained_params = copy.deepcopy(pretrained_gpt2_model_dict) #ここでデコーダの単語埋め込み層を削除するのはなぜか.
+        self.pretrained_params = copy.deepcopy(pretrained_gpt2_model_dict) #ここでデコーダの単語埋め込み層を削除するのはなぜか. -> 新しいモデルで使用するボキャブラリーサイズ（vocab_size）が事前学習済みモデルのボキャブラリーサイズと異なるため、埋め込み層の重みをそのまま使用できないから.
 
         config = pretrained_gpt2_model.config
         if remove_head:
@@ -40,10 +40,10 @@ class HuggingfaceGPT2Model(AbsLM):
             pass
         else:
             self.decoder = GPT2Model(config)
-            # self.lm_head = nn.Linear(
-            #     pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
-            # )
-            self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
+            self.lm_head = nn.Linear(
+                pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
+            )
+            # self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
             self.lm_head.weight = self.decoder.wte.weight
 
     def _target_mask(self, ys_in_pad):
