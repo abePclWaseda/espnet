@@ -31,27 +31,23 @@ class HuggingfaceGPT2Model(AbsLM):
 
         pretrained_gpt2_model = GPT2Model.from_pretrained(gpt2_name)
         pretrained_gpt2_model_dict = pretrained_gpt2_model.state_dict()
-        pre_trained_lm_head = pretrained_gpt2_model_dict.pop("decoder.embed_tokens.weight")
+        # pre_trained_lm_head = pretrained_gpt2_model_dict.pop("decoder.embed_tokens.weight")
+        pretrained_gpt2_model_dict.pop("wte.weight")
         self.pretrained_params = copy.deepcopy(pretrained_gpt2_model_dict)
 
         config = pretrained_gpt2_model.config
         if remove_head:
-            config.vocab_size = vocab_size
-            config.bos_token_id = vocab_size - 1
-            config.eos_token_id = vocab_size - 1
-            config.pad_token_id = 0
-
-            self.decoder = GPT2Model(config)
-
-            self.lm_head = nn.Linear(
-            config.word_embed_proj_dim, config.vocab_size, bias=False
-            )
+            # remove_head=True の場合の処理（今回は考慮しない）
+            pass
         else:
-            self.decoder = GPT2Model(config)
-            self.lm_head = nn.Linear(
-                pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
-            )
-            self.lm_head.weight = nn.Parameter(pre_trained_lm_head)
+            # self.decoder = GPT2Model(config)
+            self.decoder = pretrained_gpt2_model
+            # self.lm_head = nn.Linear(
+            #     pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
+            # )
+            self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
+            # self.lm_head.weight = nn.Parameter(pre_trained_lm_head)
+            self.lm_head.weight = self.decoder.wte.weight
 
     def _target_mask(self, ys_in_pad):
         ys_mask = ys_in_pad != 0
