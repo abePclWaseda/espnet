@@ -32,6 +32,7 @@ class HuggingfaceOPTModel(AbsLM):
         pretrained_opt_model = OPTModel.from_pretrained(opt_name)
         pretrained_opt_model_dict = pretrained_opt_model.state_dict()
         pre_trained_lm_head = pretrained_opt_model_dict.pop("decoder.embed_tokens.weight")
+        #ここでデコーダの単語埋め込み層を削除するのはなぜか. -> 新しいモデルで使用するボキャブラリーサイズ（vocab_size）が事前学習済みモデルのボキャブラリーサイズと異なるため、埋め込み層の重みをそのまま使用できないから.
         self.pretrained_params = copy.deepcopy(pretrained_opt_model_dict)
 
         config = pretrained_opt_model.config
