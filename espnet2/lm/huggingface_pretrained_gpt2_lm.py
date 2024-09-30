@@ -31,7 +31,6 @@ class HuggingfaceGPT2Model(AbsLM):
 
         pretrained_gpt2_model = GPT2Model.from_pretrained(gpt2_name)
         pretrained_gpt2_model_dict = pretrained_gpt2_model.state_dict()
-        # pre_trained_lm_head = pretrained_gpt2_model_dict.pop("decoder.embed_tokens.weight")
         pretrained_gpt2_model_dict.pop("wte.weight")
         self.pretrained_params = copy.deepcopy(pretrained_gpt2_model_dict)
 
@@ -40,13 +39,8 @@ class HuggingfaceGPT2Model(AbsLM):
             # remove_head=True の場合の処理（今回は考慮しない）
             pass
         else:
-            # self.decoder = GPT2Model(config)
             self.decoder = pretrained_gpt2_model
-            # self.lm_head = nn.Linear(
-            #     pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
-            # )
             self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
-            # self.lm_head.weight = nn.Parameter(pre_trained_lm_head)
             self.lm_head.weight = self.decoder.wte.weight
 
     def _target_mask(self, ys_in_pad):
