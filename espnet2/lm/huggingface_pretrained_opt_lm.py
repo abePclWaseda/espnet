@@ -17,6 +17,7 @@ class HuggingfaceOPTModel(AbsLM):
         vocab_size: int,
         opt_name: str,
         remove_head: bool = True,
+        isGPT2: bool = False,
     ):
         super().__init__()
         try:
@@ -31,8 +32,10 @@ class HuggingfaceOPTModel(AbsLM):
 
         pretrained_opt_model = OPTModel.from_pretrained(opt_name)
         pretrained_opt_model_dict = pretrained_opt_model.state_dict()
-        pre_trained_lm_head = pretrained_opt_model_dict.pop("decoder.embed_tokens.weight")
-        #ここでデコーダの単語埋め込み層を削除するのはなぜか. -> 新しいモデルで使用するボキャブラリーサイズ（vocab_size）が事前学習済みモデルのボキャブラリーサイズと異なるため、埋め込み層の重みをそのまま使用できないから.
+        pre_trained_lm_head = pretrained_opt_model_dict.pop(
+            "decoder.embed_tokens.weight"
+        )
+        # ここでデコーダの単語埋め込み層を削除するのはなぜか. -> 新しいモデルで使用するボキャブラリーサイズ（vocab_size）が事前学習済みモデルのボキャブラリーサイズと異なるため、埋め込み層の重みをそのまま使用できないから.
         self.pretrained_params = copy.deepcopy(pretrained_opt_model_dict)
 
         config = pretrained_opt_model.config
@@ -45,7 +48,7 @@ class HuggingfaceOPTModel(AbsLM):
             self.decoder = OPTModel(config)
 
             self.lm_head = nn.Linear(
-            config.word_embed_proj_dim, config.vocab_size, bias=False
+                config.word_embed_proj_dim, config.vocab_size, bias=False
             )
         else:
             self.decoder = OPTModel(config)
