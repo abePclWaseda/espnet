@@ -36,7 +36,7 @@ class HuggingfaceOPTModel(AbsLM):
             pretrained_gpt2_model = GPT2Model.from_pretrained(gpt2_name)
             pretrained_gpt2_model_dict = pretrained_gpt2_model.state_dict()
             pre_trained_lm_head = pretrained_gpt2_model_dict.pop("wte.weight")
-            self.pretrained_params = copy.deepcopy(pretrained_gpt2_model_dict) 
+            self.pretrained_params = copy.deepcopy(pretrained_gpt2_model_dict)
 
             config = pretrained_gpt2_model.config
 
