@@ -21,7 +21,7 @@ class HuggingfaceOPTModel(AbsLM):
     ):
         super().__init__()
         try:
-            from transformers import OPTModel
+            from transformers import OPTModel, GPT2Model
         except Exception as e:
             print("Error: transformers is not properly installed.")
             print("Please install transformers")
@@ -30,15 +30,27 @@ class HuggingfaceOPTModel(AbsLM):
         # opt_model_name_pattern = re.compile(r"facebook/opt-\d+m")
         # assert opt_model_name_pattern.match(opt_name) is not None
 
-        pretrained_opt_model = OPTModel.from_pretrained(opt_name)
-        pretrained_opt_model_dict = pretrained_opt_model.state_dict()
-        pre_trained_lm_head = pretrained_opt_model_dict.pop(
-            "decoder.embed_tokens.weight"
-        )
-        # ここでデコーダの単語埋め込み層を削除するのはなぜか. -> 新しいモデルで使用するボキャブラリーサイズ（vocab_size）が事前学習済みモデルのボキャブラリーサイズと異なるため、埋め込み層の重みをそのまま使用できないから.
-        self.pretrained_params = copy.deepcopy(pretrained_opt_model_dict)
+        gpt2_name = opt_name
 
-        config = pretrained_opt_model.config
+        if isGPT2:
+            pretrained_gpt2_model = GPT2Model.from_pretrained(gpt2_name)
+            pretrained_gpt2_model_dict = pretrained_gpt2_model.state_dict()
+            pre_trained_lm_head = pretrained_gpt2_model_dict.pop("wte.weight")
+            self.pretrained_params = copy.deepcopy(pretrained_gpt2_model_dict) 
+
+            config = pretrained_gpt2_model.config
+
+        else:
+            pretrained_opt_model = OPTModel.from_pretrained(opt_name)
+            pretrained_opt_model_dict = pretrained_opt_model.state_dict()
+            pre_trained_lm_head = pretrained_opt_model_dict.pop(
+                "decoder.embed_tokens.weight"
+            )
+            # ここでデコーダの単語埋め込み層を削除するのはなぜか. -> 新しいモデルで使用するボキャブラリーサイズ（vocab_size）が事前学習済みモデルのボキャブラリーサイズと異なるため、埋め込み層の重みをそのまま使用できないから.
+            self.pretrained_params = copy.deepcopy(pretrained_opt_model_dict)
+
+            config = pretrained_opt_model.config
+
         if remove_head:
             config.vocab_size = vocab_size
             config.bos_token_id = vocab_size - 1
@@ -51,11 +63,18 @@ class HuggingfaceOPTModel(AbsLM):
                 config.word_embed_proj_dim, config.vocab_size, bias=False
             )
         else:
-            self.decoder = OPTModel(config)
-            self.lm_head = nn.Linear(
-                pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
-            )
-            self.lm_head.weight = nn.Parameter(pre_trained_lm_head)
+            if isGPT2:
+                self.decoder = GPT2Model(config)
+                self.lm_head = nn.Linear(
+                    pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
+                )
+                self.lm_head.weight = self.decoder.wte.weight
+            else:
+                self.decoder = OPTModel(config)
+                self.lm_head = nn.Linear(
+                    pre_trained_lm_head.size(1), pre_trained_lm_head.size(0), bias=False
+                )
+                self.lm_head.weight = nn.Parameter(pre_trained_lm_head)
 
     def _target_mask(self, ys_in_pad):
         ys_mask = ys_in_pad != 0
