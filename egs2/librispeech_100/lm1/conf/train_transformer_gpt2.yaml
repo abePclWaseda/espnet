@@ -4,6 +4,7 @@ lm: transformer_opt
 lm_conf:
     opt_name: openai-community/gpt2
     remove_head: false
+    isGPT2: true
 
 # optimization related
 grad_clip: 5.0
