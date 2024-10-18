@@ -13,7 +13,7 @@ batch_type: numel
 # accum_grad: 2
 batch_bins: 15625000
 accum_grad: 64
-max_epoch: 25
+max_epoch: 2
 
 optim: adam
 optim_conf:
