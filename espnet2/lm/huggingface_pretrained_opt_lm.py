@@ -157,7 +157,9 @@ class HuggingfaceOPTModel(AbsLM):
         """
         # merge states
         n_batch = len(ys)
-        n_layers = len(self.decoder.decoder.layers)
+        # import pdb;pdb.set_trace()
+        # n_layers = len(self.decoder.decoder.layers)
+        n_layers = len(self.decoder.h)
         if states[0] is None:
             _use_cache = True
         else:
